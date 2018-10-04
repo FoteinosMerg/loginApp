@@ -15,4 +15,4 @@ variables in production
 */
 
 if (process.env.NODE_ENV === "production") module.exports = require("./prod");
-else module.exports = require("./dev"); // File not to be commited to be for deployment
+else module.exports = require("./dev"); // File not to be commited for deployment
