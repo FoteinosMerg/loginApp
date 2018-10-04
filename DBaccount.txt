@@ -1,6 +1,0 @@
-experiment2018
-foteinosmerg@gmail.com
-FoteinosMerg
-FoteinosMerg1988
-mongo ds111623.mlab.com:11623/experiment0 -u <dbuser> -p <dbpassword>
-mongodb://<dbuser>:<dbpassword>@ds111623.mlab.com:11623/experiment0
