@@ -1,8 +1,5 @@
 "use strict";
 
-// Import env variables readability; better before all other imports
-import "dotenv/config";
-
 // Load and execute at booting; order matters!
 require("./models/User");
 require("./services/passport");
@@ -21,7 +18,7 @@ mongoose
   .catch(err => console.log(" * MongoDB connection refused"));
 
 // Initialize app
-const message = "A minimal log in application";
+const message = "A minimal log in application with json web tokens";
 const express = require("express");
 const app = express();
 
