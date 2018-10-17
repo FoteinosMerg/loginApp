@@ -5,9 +5,8 @@ const router = require("express").Router();
 /* Expansion of `node-jsonebtoken` supporting blacklisting */
 const jwt = require("jwt-blacklist")(require("jsonwebtoken"));
 jwt.config({ unitType: "h" });
-/* Generates a ``deterministic`` GUID, i.e. the same identifier for the same
-string at different moments; will be here used to generate token ids needed
-for blacklisting */
+/* Generates a ``deterministic`` GUID, i.e. the same identifier for the same string at
+different moments; will be here used to generate token ids needed for blacklisting */
 const aguid = require("aguid");
 
 const passport = require("passport");
@@ -103,9 +102,9 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     let token = req.headers["authorization"] || req.headers["x-access-token"];
-    token = token.slice(7, token.length); // Remove 'Bearer '
+    token = token.slice(7, token.length); // Remove `Bearer `
     jwt.blacklist(token);
-    req.logout(); // removes req.user property
+    req.logout(); // Reemoves req.user
     res.redirect("/");
   }
 );
