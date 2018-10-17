@@ -21,7 +21,7 @@ module.exports = passport => {
     new JwtStrategy(opts, (jwt_payload, done) => {
       console.log(" * Logged in user authenticated:");
       console.log(jwt_payload);
-      User.findById(jwt_payload.id)
+      User.findById(jwt_payload.user_id)
         .then(user => {
           if (user) return done(null, user);
           return done(null, false);

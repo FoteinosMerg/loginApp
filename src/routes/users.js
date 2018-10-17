@@ -1,7 +1,15 @@
 "use strict";
 
 const router = require("express").Router();
-const jwt = require("jsonwebtoken");
+
+/* Expansion of `node-jsonebtoken` supporting blacklisting */
+const jwt = require("jwt-blacklist")(require("jsonwebtoken"));
+jwt.config({ unitType: "h" });
+/* Generates a ``deterministic`` GUID, i.e. the same identifier for the same
+string at different moments; will be here used to generate token ids needed
+for blacklisting */
+const aguid = require("aguid");
+
 const passport = require("passport");
 
 const keys = require("../config/keys");
@@ -10,9 +18,9 @@ const User = require("../models/User");
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
 
-/* @route     POST users/register
-   @route     Register user
-   @ access   Public */
+/* @route           POST /api/users/register
+   @description     Register user
+   @ access         Public */
 router.post("/register", (req, res) => {
   // Validation
   const { errors, isValid } = validateRegisterInput(req.body);
@@ -39,9 +47,9 @@ router.post("/register", (req, res) => {
   });
 });
 
-/* @route     GET users/login
-   @route     Login user (returning JSON web token)
-   @ access   Public */
+/* @route           GET api/users/login
+   @description     Login user (returning JSON web token)
+   @ access         Public */
 router.post("/login", (req, res) => {
   // Validation
   const { errors, isValid } = validateLoginInput(req.body);
@@ -52,17 +60,18 @@ router.post("/login", (req, res) => {
     req.body.password,
     (user, verified) => {
       if (verified) {
-        // Create token payload (user info)
+        // Create token payload (user info plus token id for blacklisting)
         const payload = {
-          id: user.id,
-          username: user.username
+          user_id: user.id,
+          username: user.username,
+          token_id: aguid()
         };
 
         // Sign and send token to browser (expires after 60 min)
         jwt.sign(
           payload,
           keys.secretOrKey,
-          { expiresIn: 3600 },
+          { expiresIn: "1h" },
           (err, token) => {
             res.json({
               verified: true,
@@ -75,30 +84,29 @@ router.post("/login", (req, res) => {
   );
 });
 
-/* @route     GET users/current
-   @route     Returns info about currently logged in user
-   @ access   Private */
+/* @route         GET api/users/current
+   @description   Returns info about currently logged in user
+   @access        Private */
 router.get(
   "/current",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    res.json({
-      id: req.user.id,
-      username: req.user.username,
-      email: req.user.email
-    });
+    res.json(req.user);
   }
 );
 
-/* @route     GET users/logout
-   @route     Logs currently logged in user out
-   @ access   Private */
+/* @route         GET api/users/logout
+   @description   Logs currently logged in user out
+   @access        Private */
 router.get(
   "/logout",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    //req.logout(); // removes req.user property
-    //res.redirect("/");
+    let token = req.headers["authorization"] || req.headers["x-access-token"];
+    token = token.slice(7, token.length); // Remove 'Bearer '
+    jwt.blacklist(token);
+    req.logout(); // removes req.user property
+    res.redirect("/");
   }
 );
 

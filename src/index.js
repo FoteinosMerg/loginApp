@@ -33,10 +33,9 @@ app.use(passport.initialize());
 require("./services/passport")(passport);
 
 // Routing
-app.use("/users", require("./routes/users"));
-
-// Client side message
-app.get("/", (req, res) => res.send(message));
+app.get(["/", "/index"], (req, res) => res.send(message));
+app.get(["/api/test", "/index"], (req, res) => res.send("Test api proxy"));
+app.use("/api/users", require("./routes/users"));
 
 // Bind dynamically to port and display server-side messages
 const PORT = process.env.PORT || 5000;
