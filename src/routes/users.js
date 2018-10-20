@@ -90,6 +90,7 @@ router.get(
   "/current",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
+    //res.send(req.user);
     res.json(req.user);
   }
 );
@@ -104,7 +105,7 @@ router.get(
     let token = req.headers["authorization"] || req.headers["x-access-token"];
     token = token.slice(7, token.length); // Remove `Bearer `
     jwt.blacklist(token);
-    req.logout(); // Reemoves req.user
+    req.logout(); // Remove req.user
     res.redirect("/");
   }
 );

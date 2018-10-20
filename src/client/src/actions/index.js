@@ -1,5 +1,7 @@
 // Makes ajax requests to backend api
 import axios from "axios";
+
+// Import action types
 import { FETCH_USER } from "./types";
 
 // Define action creators

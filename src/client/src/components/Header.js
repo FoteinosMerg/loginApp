@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 class Header extends Component {
   renderContent() {
     switch (this.props.auth) {
-    case null:
+      case null:
         return; // Page loading
       case false:
         return (
